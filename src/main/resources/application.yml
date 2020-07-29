@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Shanghai
+    name: test
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  thymeleaf:
+    cache: false
+    encoding: utf-8
+    mode: HTML
+    prefix: classpath:/templates/
+    suffix: .html
+    check-template-location: true
+    content-type: text/html
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: true
+
+#    没啥效果一样
+#  resources:
+#    static-locations: file:E://img/,classpath:/static/
+#  mvc:
+#    static-path-pattern: /imglocalhost/**
+
+
+#在mapper/*.xml文件下写sql语句
+mybatis:
+  mapper-locations: classpath:mbgMapper/*.xml
+  type-aliases-package: com.example.test.pojo
+
+server:
+  port: 8081
+
+mybatis-plus:
+  type-aliases-package: com.example.test.pojo
+  mapper-locations: classpath:/mbgMapper/*Mapper.xml
+
+pagehelper:
+  helper-dialect: mysql

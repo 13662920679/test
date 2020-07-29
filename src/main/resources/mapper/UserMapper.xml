@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.test.mapper.UserMapper">
+
+    <!--根据name和password查询user-->
+    <select id="login" parameterType="String" resultType="com.example.test.pojo.User">
+        SELECT * from user where username = #{username} and userpwd = #{userpwd}
+    </select>
+
+    <!--传入name和password插入user-->
+    <insert id="reg" parameterType="com.example.test.pojo.User">
+        insert into user (username,userpwd) values (#{username},#{userpwd})
+    </insert>
+
+</mapper>

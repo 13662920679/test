@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <script src="/js/jquery-3.4.1.js"></script>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+
+    <script type="application/javascript">
+
+        function reg(){
+            $.ajax({
+                url:"/login/reg",
+                type:"post",
+                data:JSON.stringify({
+                    username:$("#username").val(),
+                    userpwd:$("#userpwd").val()
+                }),
+                dataType:"json",
+                contentType : "application/json",
+                success:function(data){
+                    alert("注册"+data.ifSuccess);
+                },
+                error:function(e){
+                    console.log(e);
+                    alert("error:"+"sdasd");
+                }
+            })
+        }
+
+    </script>
+</head>
+<body>
+    <form id="form1" action="../../login/loginInto" method="post">
+        账号：<input type="text" id="username" name = "username"> <br>
+        密码：<input type="password" id = "userpwd" name = "userpwd"> <br>
+        <button type="submit">login</button>
+    </form>
+    <a href="/toPage/huang">huang跳转链接</a><br>
+    <button type="button" id="reg" onclick="reg()">reg</button>
+    <br>
+    <br>
+    <img src="" alt="" id="IsImgEmployeePicture" style="border:1px solid #999;display: block;width: 300px;height: 300px;" onclick="chooseImageFile('EmployeePicture')" />
+    <input type="file" name="fileEmployeeImage" id="EmployeePicture" hidden accept="image/*" onchange="showImgToView('EmployeePicture')" />
+
+</body>
+
+<script>
+    //1、单击调用chooseImageFile方法
+    function chooseImageFile(inputFileID) {
+        $("#" + inputFileID).click();   //模拟点击EmployeePicture（input）,出发showImgToView()方法
+    }
+
+    //2、创建FileReader对象
+    var fileReader = new FileReader();
+    //正在判断是否符合图片类型
+    regexImageFile = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
+
+    //3、利用改变事件将图片显示出来
+    function showImgToView(inputFileId) {
+        //选择图片文件
+        var imgFile = $("#" + inputFileId).get(0).files[0];
+        //判断上传文件是否为图片格式
+        if (!regexImageFile.test(imgFile.type)) {
+            return;
+        } else {
+            //将文件读取为DataURL
+            fileReader.readAsDataURL(imgFile);
+        }
+    }
+
+    //4、读取文件
+    fileReader.onload = function (evt) {
+        //将该URL绑定到img标签的src属性上，就可以实现图片的上传预览效果
+        $("#IsImgEmployeePicture").attr("src", evt.target.result);
+    }
+</script>
+
+</html>
