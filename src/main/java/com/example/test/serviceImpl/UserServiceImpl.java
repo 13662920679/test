@@ -24,4 +24,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.reg(user);
     }
 
+    @Override
+    public User selectUser(User user) {
+        return userMapper.selectUser(user);
+    }
+
 }

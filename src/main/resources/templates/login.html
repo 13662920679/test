@@ -6,6 +6,8 @@
 
     <script src="/js/jquery-3.4.1.js"></script>
     <script src="/js/jquery-3.4.1.min.js"></script>
+    <!--MD5加密-->
+    <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
 
     <script type="application/javascript">
 
@@ -24,7 +26,34 @@
                 },
                 error:function(e){
                     console.log(e);
-                    alert("error:"+"sdasd");
+                    alert("error:"+"注册失败");
+                }
+            })
+        }
+
+        function md5Login(){
+            var salt = '20201009163200';
+            var pwd = $("#userpwd").val();
+            var pwdMd5 = md5(pwd);
+            var strMd5 = md5(pwdMd5+salt);
+            alert(strMd5);
+            $.ajax({
+                url:"/login/loginInto2",
+                type:"post",
+                data:JSON.stringify({
+                    username:$("#username").val(),
+                    userpwd:strMd5
+                }),
+                dataType:"html",
+                contentType : "application/json",
+                success:function(data){
+                    $("body").html(data);
+                    // alert("登录"+data.ifLoginSuccess);
+                    // window.location.replace("/login/loginInto/"+data.ifLoginSuccess);
+                },
+                error:function(e){
+                    console.log(e);
+                    alert("error:"+"登录error");
                 }
             })
         }
@@ -35,15 +64,15 @@
     <form id="form1" action="../../login/loginInto" method="post">
         账号：<input type="text" id="username" name = "username"> <br>
         密码：<input type="password" id = "userpwd" name = "userpwd"> <br>
-        <button type="submit">login</button>
+        <button id="login" type="submit" >表单登录</button>
     </form>
+    <button id="md5Login" type="button" onclick="md5Login()">加密登录</button>
     <a href="/toPage/huang">huang跳转链接</a><br>
     <button type="button" id="reg" onclick="reg()">reg</button>
     <br>
     <br>
     <img src="" alt="" id="IsImgEmployeePicture" style="border:1px solid #999;display: block;width: 300px;height: 300px;" onclick="chooseImageFile('EmployeePicture')" />
     <input type="file" name="fileEmployeeImage" id="EmployeePicture" hidden accept="image/*" onchange="showImgToView('EmployeePicture')" />
-
 </body>
 
 <script>

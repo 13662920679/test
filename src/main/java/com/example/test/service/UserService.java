@@ -16,4 +16,6 @@ public interface UserService {
     //注册
     Long reg(User user);
 
+    User selectUser(User user);
+
 }

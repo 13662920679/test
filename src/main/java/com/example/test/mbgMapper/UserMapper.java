@@ -47,4 +47,6 @@ public interface UserMapper extends BaseMapper<User> {
     List<User> allUser();
 
     Page<User> getUserList();
+
+    User selectUser(@Param("user")User user);
 }

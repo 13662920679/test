@@ -5,14 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.test.pojo.User;
 import com.example.test.pojo.vo.UserVO;
 import com.example.test.service.UserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
@@ -54,6 +52,29 @@ public class LoginController {
 //            return "error";
         }
     }
+    //登录成功失败界面2
+    @ResponseBody
+    @RequestMapping(value = "/loginInto2",method = RequestMethod.POST)
+    public ModelAndView loginInto2(@RequestBody UserVO userVO){
+        String salt = "20201009163200";
+        User user1 = new User();
+        user1.setUsername(userVO.getUsername());
+        User user2 = userService.selectUser(user1);
+        String userpwd = user2.getUserpwd();
+        String userpwdMd5 = userpwd+salt;
+        String strMd5 = DigestUtils.md5DigestAsHex(userpwdMd5.getBytes());
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("loginIf");
+        if (userVO.getUserpwd().equals(strMd5)){
+            System.out.println("登录成功!!!用户名:"+userVO.getUsername());
+            modelAndView.addObject("message","成功");
+            return modelAndView;
+        }else{
+            System.out.println("登录失败!");
+            modelAndView.addObject("message","失败");
+            return modelAndView;
+        }
+    }
 
     //  注册
     //      前端用ajax传json参数-->后端controller用实体接收
@@ -83,5 +104,11 @@ public class LoginController {
         return "huang";
     }
 
-
+    @RequestMapping("/loginInto/{ifLoginSuccess}")
+    public ModelAndView loginTf(@PathVariable String ifLoginSuccess){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("loginIf");
+        modelAndView.addObject("message",ifLoginSuccess);
+        return modelAndView;
+    }
 }

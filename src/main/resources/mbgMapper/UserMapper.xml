@@ -189,8 +189,18 @@
     <select id="getUserList" resultType="com.example.test.pojo.User">
       select * from user
     </select>
+  <select id="selectUser" resultType="com.example.test.pojo.User">
+    select
+    <include refid="Base_Column_List"></include>
+    from user
+    <where>
+      <if test="user.username!=null and user.username!='' ">
+        and username = #{user.username}
+      </if>
+    </where>
+  </select>
 
-    <!--传入name和password插入user-->
+  <!--传入name和password插入user-->
   <insert id="reg" parameterType="com.example.test.pojo.User">
         insert into user (username,userpwd) values (#{username},#{userpwd})
     </insert>
