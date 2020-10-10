@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.test.pojo.User;
 import com.example.test.pojo.vo.UserVO;
 import com.example.test.service.UserService;
+import com.example.test.utils.VerifyUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -55,8 +59,10 @@ public class LoginController {
     //登录成功失败界面2
     @ResponseBody
     @RequestMapping(value = "/loginInto2",method = RequestMethod.POST)
-    public ModelAndView loginInto2(@RequestBody UserVO userVO){
-        String salt = "20201009163200";
+    public ModelAndView loginInto2(@RequestBody UserVO userVO,HttpServletRequest request){
+        HttpSession session = request.getSession();
+        String salt = (String) session.getAttribute("loginRandomCode");
+//        String salt = "20201009163200";
         User user1 = new User();
         user1.setUsername(userVO.getUsername());
         User user2 = userService.selectUser(user1);
@@ -110,5 +116,17 @@ public class LoginController {
         modelAndView.setViewName("loginIf");
         modelAndView.addObject("message",ifLoginSuccess);
         return modelAndView;
+    }
+
+    @ResponseBody
+    @PostMapping("/createRandomCode")
+    public JSONObject createRandomCode(HttpServletRequest request){
+        VerifyUtil verifyUtil = new VerifyUtil();
+        String salt = verifyUtil.createRandomCode(4);
+        HttpSession session = request.getSession();
+        session.setAttribute("loginRandomCode",salt);
+        JSONObject json = new JSONObject();
+        json.put("loginRandomCode",salt);
+        return json;
     }
 }

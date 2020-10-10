@@ -32,28 +32,40 @@
         }
 
         function md5Login(){
-            var salt = '20201009163200';
-            var pwd = $("#userpwd").val();
-            var pwdMd5 = md5(pwd);
-            var strMd5 = md5(pwdMd5+salt);
-            alert(strMd5);
+            var salt;
             $.ajax({
-                url:"/login/loginInto2",
+                url:"/login/createRandomCode",
                 type:"post",
-                data:JSON.stringify({
-                    username:$("#username").val(),
-                    userpwd:strMd5
-                }),
-                dataType:"html",
+                dataType:"json",
                 contentType : "application/json",
                 success:function(data){
-                    $("body").html(data);
-                    // alert("登录"+data.ifLoginSuccess);
-                    // window.location.replace("/login/loginInto/"+data.ifLoginSuccess);
+                    salt = data.loginRandomCode;
+                    var pwd = $("#userpwd").val();
+                    var pwdMd5 = md5(pwd);
+                    var strMd5 = md5(pwdMd5+salt);
+                    $.ajax({
+                        url:"/login/loginInto2",
+                        type:"post",
+                        data:JSON.stringify({
+                            username:$("#username").val(),
+                            userpwd:strMd5
+                        }),
+                        dataType:"html",
+                        contentType : "application/json",
+                        success:function(data){
+                            $("body").html(data);
+                            // alert("登录"+data.ifLoginSuccess);
+                            // window.location.replace("/login/loginInto/"+data.ifLoginSuccess);
+                        },
+                        error:function(e){
+                            console.log(e);
+                            alert("error:"+"登录error");
+                        }
+                    })
                 },
                 error:function(e){
                     console.log(e);
-                    alert("error:"+"登录error");
+                    alert("error:"+"获取随机码error");
                 }
             })
         }
