@@ -125,6 +125,7 @@ public class LoginController {
         String salt = verifyUtil.createRandomCode(4);
         HttpSession session = request.getSession();
         session.setAttribute("loginRandomCode",salt);
+        session.setMaxInactiveInterval(10);
         JSONObject json = new JSONObject();
         json.put("loginRandomCode",salt);
         return json;
