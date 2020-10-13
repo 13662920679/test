@@ -85,6 +85,9 @@
     <br>
     <img src="" alt="" id="IsImgEmployeePicture" style="border:1px solid #999;display: block;width: 300px;height: 300px;" onclick="chooseImageFile('EmployeePicture')" />
     <input type="file" name="fileEmployeeImage" id="EmployeePicture" hidden accept="image/*" onchange="showImgToView('EmployeePicture')" />
+
+    <input type="file" name="file" id="file" multiple="multiple" />
+    <input type="button" name="uploadFile" id="uploadFile" onclick="uploadFile()"/>
 </body>
 
 <script>
@@ -118,4 +121,29 @@
     }
 </script>
 
+<script>
+    function uploadFile() {
+        // var files = new Array();
+        // files[0] = $("#file").get(0).files[0];
+        // files[1] = $("#file").get(0).files[0];
+        var formData = new FormData();
+        formData.append("file",$("#file").get(0).files[0]);
+        // formData.append("file",files);
+        formData.append("businessId","test");
+        $.ajax({
+            url:"/file/addFiles",
+            type:"post",
+            data:formData,
+            dataType:"json",
+            contentType : false,
+            processData:false,
+            success:function(data){
+                alert("成功");
+            },
+            error:function(){
+                alert("失败");
+            }
+        })
+    }
+</script>
 </html>
