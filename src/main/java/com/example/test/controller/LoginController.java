@@ -60,7 +60,13 @@ public class LoginController {
     @ResponseBody
     @RequestMapping(value = "/loginInto2",method = RequestMethod.POST)
     public ModelAndView loginInto2(@RequestBody UserVO userVO,HttpServletRequest request){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("loginIf");
         HttpSession session = request.getSession();
+        if (!(boolean)session.getAttribute("loginPass")){
+            System.out.println("登录异常，取消登录操作!");
+            return modelAndView.addObject("message","登录异常，取消登录操作!");
+        }
         String salt = (String) session.getAttribute("loginRandomCode");
 //        String salt = "20201009163200";
         User user1 = new User();
@@ -69,11 +75,10 @@ public class LoginController {
         String userpwd = user2.getUserpwd();
         String userpwdMd5 = userpwd+salt;
         String strMd5 = DigestUtils.md5DigestAsHex(userpwdMd5.getBytes());
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("loginIf");
         if (userVO.getUserpwd().equals(strMd5)){
             System.out.println("登录成功!!!用户名:"+userVO.getUsername());
             modelAndView.addObject("message","成功");
+            session.setAttribute("loginPass",false);
             return modelAndView;
         }else{
             System.out.println("登录失败!");
@@ -125,9 +130,12 @@ public class LoginController {
         String salt = verifyUtil.createRandomCode(4);
         HttpSession session = request.getSession();
         session.setAttribute("loginRandomCode",salt);
-        session.setMaxInactiveInterval(10);
+//        session.setMaxInactiveInterval(10);//10秒
         JSONObject json = new JSONObject();
         json.put("loginRandomCode",salt);
+
+        session.setAttribute("loginPass",true);
+
         return json;
     }
 }

@@ -1,7 +1,9 @@
 package com.example.test.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,5 +54,26 @@ public class FileController {
         JSONObject json = new JSONObject();
         json.put("pass",true);
         return json;
+    }
+
+    /**
+     * 下载附件（单个）
+     * @param path
+     * @param fileName
+     * @return
+     */
+    @PostMapping("/download")
+    public ResponseEntity<byte[]> download(String path,String fileName){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        byte[] bytes = new byte[0];
+        try {
+            bytes = FileCopyUtils.copyToByteArray(new File(path+fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+//            return ServerResponse.errorMessage("下载附件出错");
+        }
+        return new ResponseEntity<>(bytes,headers, HttpStatus.OK);
     }
 }
