@@ -62,7 +62,7 @@ public class FileController {
      * @param fileName
      * @return
      */
-    @PostMapping("/download")
+    @RequestMapping("/download")
     public ResponseEntity<byte[]> download(String path,String fileName){
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
@@ -74,6 +74,7 @@ public class FileController {
             e.printStackTrace();
 //            return ServerResponse.errorMessage("下载附件出错");
         }
+
         return new ResponseEntity<>(bytes,headers, HttpStatus.OK);
     }
 }

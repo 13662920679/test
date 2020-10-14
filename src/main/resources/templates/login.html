@@ -89,7 +89,8 @@
     <input type="file" name="file" id="file" multiple="multiple" />
     <button name="uploadFile" id="uploadFile" onclick="uploadFile()" >上传</button>
 
-    <a href="C:\Users\Administrator\Pictures\Saved Pictures\1.PNG" download="1.PNG">download</a>
+<!--    <a href="C:\Users\Administrator\Pictures\Saved Pictures\1.PNG" download="1.PNG">download</a>-->
+    <button onclick="download()">download</button>
 </body>
 
 <script>
@@ -146,6 +147,9 @@
                 alert("失败");
             }
         })
+    }
+    function download() {
+        window.location.href='/file/download?path=C:/Users/Administrator/Desktop/'+'&'+'fileName=文本的json格式.txt'
     }
 </script>
 </html>
