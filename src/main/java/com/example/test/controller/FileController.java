@@ -11,6 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.readAllBytes;
+import static org.springframework.http.ContentDisposition.builder;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
 @RequestMapping("/file")
@@ -63,18 +70,28 @@ public class FileController {
      * @return
      */
     @RequestMapping("/download")
-    public ResponseEntity<byte[]> download(String path,String fileName){
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        byte[] bytes = new byte[0];
-        try {
-            bytes = FileCopyUtils.copyToByteArray(new File(path+fileName));
-        } catch (IOException e) {
-            e.printStackTrace();
-//            return ServerResponse.errorMessage("下载附件出错");
-        }
+    public ResponseEntity<byte[]> download(String path,String fileName) throws IOException {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());
+//        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//        byte[] bytes = new byte[0];
+//        try {
+//            bytes = FileCopyUtils.copyToByteArray(new File(path+fileName));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+////            return ServerResponse.errorMessage("下载附件出错");
+//        }
+//
+//        return new ResponseEntity<>(bytes,headers, HttpStatus.OK);
 
-        return new ResponseEntity<>(bytes,headers, HttpStatus.OK);
+        String filePath = path+fileName;
+        return ok().headers(
+                h ->
+                        h.setContentDisposition(
+                                builder("attachment")
+                                        .filename(filePath.substring(filePath.lastIndexOf('/') + 1), UTF_8)
+                                        .build()))
+                .contentType(APPLICATION_OCTET_STREAM)
+                .body(readAllBytes(Paths.get(filePath)));
     }
 }
