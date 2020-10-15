@@ -89,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasAnyRole("ADMIN","SUPER")//拥有 ADMIN 或 SUPER 可以访问
                 .antMatchers("/huang").access("hasRole('ADMIN') and hasRole('SUPER')")//拥有 ADMIN 且 SUPER 可以访问
 //                .anyRequest().permitAll()//其他没有限定的请求，允许访问
-//                .anyRequest().authenticated()//任何没有匹配上的其他的url请求，只需要用户被验证
+                .anyRequest().authenticated()//任何没有匹配上的其他的url请求，只需要用户被验证
                 .and()
 //            .anonymous()
 //                .and()
