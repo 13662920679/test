@@ -2,6 +2,7 @@ package com.example.test.config;
 
 import com.example.test.security.CustomAccessDeineHandler;
 import com.example.test.security.CustomAuthenticationEntryPoint;
+import com.example.test.security.CustomUserDatailService;
 import com.example.test.utils.MyAccessDenied;
 import com.example.test.utils.MyAuthenticationFailHandler;
 import com.example.test.utils.MyUserDatailService;
@@ -24,22 +25,25 @@ import static org.hibernate.criterion.Restrictions.and;
 @EnableWebSecurity// 这个注解必须加，开启Security
 //@EnableGlobalMethodSecurity(prePostEnabled = true)//保证post之前的注解可以使用
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    //二代
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Autowired
     private CustomAccessDeineHandler customAccessDeineHandler;
+    @Autowired
+    private CustomUserDatailService customUserDatailService;
 
+    //一代
     @Autowired
     private MyAuthenticationFailHandler myAuthenticationFailHandler;
     @Autowired
     private MyAccessDenied myAccessDenied;
-
     @Autowired
     private MyUserDatailService userDatailService;
 
     /**
      * 指定加密方式
+     *  使用BCrypt加密密码
      */
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -47,8 +51,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+
+    //  验证身份
+    // huang:方法名不重要，参数是AuthenticationManagerBuilder就行，只能一个地方用
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+        /*写死*/
 //        auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder())
 //                .withUser("admin")
 //                .password(new BCryptPasswordEncoder().encode("admin"))
@@ -61,11 +69,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .withUser("test")
 //                .password(new BCryptPasswordEncoder().encode("test"))
 //                .roles("TEST");
-        auth.userDetailsService(userDatailService)
+
+        //数据库获取
+        auth.userDetailsService(customUserDatailService)
         .passwordEncoder(passwordEncoder());
     }
 
-    //拦截
+    //  拦截
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
