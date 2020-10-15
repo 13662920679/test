@@ -89,7 +89,7 @@ public class FileController {
                 h ->
                         h.setContentDisposition(
                                 builder("attachment")
-                                        .filename(filePath.substring(filePath.lastIndexOf('/') + 1), UTF_8)
+                                        .filename(fileName, UTF_8)
                                         .build()))
                 .contentType(APPLICATION_OCTET_STREAM)
                 .body(readAllBytes(Paths.get(filePath)));
