@@ -1,5 +1,6 @@
 package com.example.test.utils;
 
+import com.example.test.pojo.RoleUser;
 import com.example.test.pojo.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,6 +20,18 @@ public class JwtTokenUtil {
                 .setSubject(Long.toString(user.getId()))
                 .claim(USER_ID,user.getId())
                 .claim(USERNAME,user.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis()+EXPIRITION))
+                .signWith(SignatureAlgorithm.HS512,APPSECRET_KEY)
+                .compact();
+        return token;
+    }
+    public static String createToken(RoleUser roleUser){
+        String token = Jwts
+                .builder()
+                .setSubject(Long.toString(roleUser.getId()))
+                .claim(USER_ID,roleUser.getId())
+                .claim(USERNAME,roleUser.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis()+EXPIRITION))
                 .signWith(SignatureAlgorithm.HS512,APPSECRET_KEY)
