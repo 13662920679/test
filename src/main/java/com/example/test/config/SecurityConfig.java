@@ -1,23 +1,33 @@
 package com.example.test.config;
 
+import com.example.test.pojo.RoleUser;
 import com.example.test.security.CustomAccessDeineHandler;
 import com.example.test.security.CustomAuthenticationEntryPoint;
 import com.example.test.security.CustomUserDatailService;
+import com.example.test.service.RoleUserService;
+import com.example.test.utils.JwtTokenUtil;
 import com.example.test.utils.MyAccessDenied;
 import com.example.test.utils.MyAuthenticationFailHandler;
 import com.example.test.utils.MyUserDatailService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import java.io.PrintWriter;
 
 import static org.hibernate.criterion.Restrictions.and;
 
@@ -25,6 +35,9 @@ import static org.hibernate.criterion.Restrictions.and;
 @EnableWebSecurity// 这个注解必须加，开启Security
 //@EnableGlobalMethodSecurity(prePostEnabled = true)//保证post之前的注解可以使用
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private RoleUserService roleUserService;
+
     //二代
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -47,7 +60,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public PasswordEncoder passwordEncoder(){
-        // 使用BCrypt加密密码
         return new BCryptPasswordEncoder();
     }
 
@@ -71,8 +83,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .roles("TEST");
 
         //数据库获取
-        auth.userDetailsService(customUserDatailService)
-        .passwordEncoder(passwordEncoder());
+        auth
+                .authenticationProvider(daoAuthenticationProvider())
+//                .userDetailsService(customUserDatailService)
+//                .passwordEncoder(passwordEncoder())
+        ;
     }
 
     //  拦截
@@ -87,7 +102,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/index").permitAll()//任何用户都可以访问
                 .antMatchers("/login/**").hasRole("ADMIN")//拥有 ADMIN 可以访问
                 .antMatchers("/admin/**").hasAnyRole("ADMIN","SUPER")//拥有 ADMIN 或 SUPER 可以访问
-                .antMatchers("/huang").access("hasRole('ADMIN') and hasRole('SUPER')")//拥有 ADMIN 且 SUPER 可以访问
+//                .antMatchers("/huang").access("hasRole('ADMIN') and hasRole('SUPER')")//拥有 ADMIN 且 SUPER 可以访问
 //                .anyRequest().permitAll()//其他没有限定的请求，允许访问
                 .anyRequest().authenticated()//任何没有匹配上的其他的url请求，只需要用户被验证
                 .and()
@@ -95,6 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
             .formLogin()//允许用户进行基于表单的认证 ; 默认使用 spring security 登录页面
 //                .failureHandler(myAuthenticationFailHandler)//自定义登录失败操作
+//                .successHandler(authenticationSuccessHandler())
                 .and()
             .httpBasic()//允许用户使用HTTP基于验证进行认证
                 .and()
@@ -107,7 +123,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .deleteCookies(cookieNamesToClear)
                 .and()
             .csrf().disable()//防止csdf攻击
+            .sessionManagement().disable()  //禁用session
         ;
     }
 
+    @Bean
+    protected AuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(customUserDatailService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler(){
+        return (httpServletRequest, httpServletResponse, authentication) -> {
+            if (httpServletResponse.isCommitted()){
+                System.out.println("Response has already been committed");
+                return;
+            }
+            UserDetails principal = (UserDetails) authentication.getPrincipal();
+            RoleUser roleUser = roleUserService.getRoleUserByUsername(principal.getUsername());
+            String token = JwtTokenUtil.createToken(roleUser);
+            PrintWriter out = httpServletResponse.getWriter();
+
+            ResponseEntity.ok().body(token);
+        };
+    }
 }

@@ -29,15 +29,18 @@ spring:
 
 #在mapper/*.xml文件下写sql语句
 mybatis:
-  mapper-locations: classpath:mbgMapper/*.xml
+  mapper-locations: classpath:mbgMapper/**/*.xml
   type-aliases-package: com.example.test.pojo
+  configuration:
+    #开启驼峰功能
+    map-underscore-to-camel-case: true
 
 server:
   port: 8088
 
 mybatis-plus:
   type-aliases-package: com.example.test.pojo
-  mapper-locations: classpath:/mbgMapper/*Mapper.xml
+  mapper-locations: classpath:/mbgMapper/**/*Mapper.xml
 
 pagehelper:
   helper-dialect: mysql

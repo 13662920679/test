@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScans;
 @SpringBootConfiguration
 //@ComponentScan(value = "com.example.test.config")//加上会403错误
 //@ComponentScan(basePackages = {"com.example.test.serviceImpl","com.example.test.service"})//加上会404错误
-//@MapperScan("com.example.test.mapper")
+@MapperScan("com.example.test.mbgMapper")//扫描Mapper接口类，并生成对应的实现类
 public class TestApplication {
     public static void main(String[] args) {
         SpringApplication.run(TestApplication.class, args);

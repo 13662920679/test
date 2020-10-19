@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-@Mapper
+//@Mapper//springboot启动类使用了@MapperScan的话，这里可以不用此标签
 @Repository
 public interface RoleUserMapper {
     long countByExample(RoleUserExample example);
