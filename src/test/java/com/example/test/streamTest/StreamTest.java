@@ -58,6 +58,12 @@ class StreamTest {
             return 1;
         });
         manList.stream().forEach(System.out::println);
+        //4
+        List<String> collect = manList.stream().map(n -> n.getName())
+                .collect(Collectors.toList());
+//        collect.sort((n1,n2) -> n1.compareTo(n2));
+        collect.stream().forEach(System.out::println);
+
     }
 
     @Data
